@@ -42,7 +42,7 @@
           src = ./.;
 
           nativeBuildInputs = with pkgs; [ pkgsStatic.stdenv.cc pkgsStatic.pkg-config ];
-          buildInputs = with pkgs; [ pkgsStatic.cryptsetup pkgsStatic.rustPlatform.bindgenHook ];
+          buildInputs = with pkgs; [ pkgsStatic.cryptsetup rustPlatform.bindgenHook ];
 
           # Configures the target which will be built.
           # ref: https://doc.rust-lang.org/cargo/reference/config.html#buildtarget
