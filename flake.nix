@@ -32,7 +32,6 @@
             ${oldAttrs.postFixup or ""}
             cat <<EOF >> $dev/lib/pkgconfig/libcryptsetup.pc
               Requires.private: uuid, json-c, devmapper, libcrypto, blkid
-              Libs.private: -lc
             EOF
           '';
         });
@@ -76,6 +75,8 @@
           # ref: https://doc.rust-lang.org/cargo/reference/config.html#targettriplelinker
           CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = with pkgs.pkgsStatic.stdenv;
             "${cc}/bin/${cc.targetPrefix}gcc";
+          # link against libc.a
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-lc";
 
           doCheck = true;
         };
