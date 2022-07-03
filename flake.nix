@@ -27,6 +27,15 @@
           cargo = toolchain;
           rustc = toolchain;
         };
+        cryptsetup-with-deps = pkgs.pkgsStatic.cryptsetup.overrideAttrs (_: oldAttrs: {
+          postFixup = ''
+            ${oldAttrs.postFixup or ""}
+            cat <<EOF >> $dev/lib/pkgconfig/libcryptsetup.pc
+              Requires.private: uuid, json-c, devmapper, libcrypto, blkid
+              Libs.private: -lc
+            EOF
+          '';
+        });
       in
       rec {
         defaultPackage = packages.x86_64-unknown-linux-musl;
@@ -42,7 +51,7 @@
           src = ./.;
 
           nativeBuildInputs = with pkgs; [ pkgsStatic.stdenv.cc pkgsStatic.pkg-config ];
-          buildInputs = with pkgs; [ pkgsStatic.cryptsetup rustPlatform.bindgenHook ];
+          buildInputs = with pkgs; [ cryptsetup-with-deps rustPlatform.bindgenHook ];
 
           # Configures the target which will be built.
           # ref: https://doc.rust-lang.org/cargo/reference/config.html#buildtarget
@@ -65,8 +74,8 @@
           # This is only necessary if rustc doesn't already know the correct linker to use.
           #
           # ref: https://doc.rust-lang.org/cargo/reference/config.html#targettriplelinker
-          # CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = with pkgs.pkgsStatic.stdenv;
-          #   "${cc}/bin/${cc.targetPrefix}gcc";
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = with pkgs.pkgsStatic.stdenv;
+            "${cc}/bin/${cc.targetPrefix}gcc";
 
           doCheck = true;
         };
